@@ -105,11 +105,11 @@ class Timetables
         timetable.forEach((period,index) => {
             let periodLessons = ""
             period.forEach(student=>{
-                periodLessons += `**${student.name}** - ${student.class}\n`
+                periodLessons += `${student.name} - ${student.class}\n`
             })
             if(periodLessons == "")periodLessons = "No one is in for this period"
             if(index == 3)embed.addField("\u200B","\u200B")
-            embed.addField("Period " + index,periodLessons,true)
+            embed.addField("**Period " + index + "**",periodLessons,true)
         })
     }
 
