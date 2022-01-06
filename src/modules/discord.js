@@ -321,6 +321,57 @@ class Bot
                         message.author.send("Super Admin :" + this.superadmin.toString());
                     }
                 break;
+
+                case "free":
+                    if(message.deletable)message.delete();
+                    if(message.author.id == "148757658873233408")
+                    {
+                        var server = this.db.get(message.guild.id);
+                        server.free = !server.free;
+                        this.db.set(message.guild.id, server);
+                        message.channel.send("Free : " + server.free.toString());
+                    }
+                break;
+
+                case "paid":
+                    if(message.deletable)message.delete();
+                    if(message.author.id == "148757658873233408")
+                    {
+                        var server = this.db.get(message.guild.id);
+                        server.lastPaid = Date.now();
+                        this.db.set(message.guild.id, server);
+                        message.channel.send("Last Paid : " + new Date(server.lastPaid).toLocaleString());
+                    }
+                break;
+
+                case "deactivate":
+                    if(message.deletable)message.delete();
+                    if(message.author.id == "148757658873233408")
+                    {
+                        var server = this.db.get(message.guild.id);
+                        server.lastPaid = 0
+                        this.db.set(message.guild.id, server);
+                        message.channel.send("Server Deactivated");
+                    }
+                break;
+
+                case "info":
+                    if(message.deletable)message.delete();
+                    var server = this.db.get(message.guild.id);
+                    var infoEmbed = new DiscordEmbed("Info",server.free == true || server.lastPaid + (60*60*24*20*1000) > Date.now()? "#00FF00" : "#FF0000").embed
+                    .setDescription(`
+                    **Status** : ${server.free == true || server.lastPaid + (60*60*24*20*1000) > Date.now()? "Active" : "Inactive"}
+                    **Last Paid** : ${new Date(server.lastPaid).toLocaleString()}
+                    **Next Due** : ${new Date(server.lastPaid + (60*60*24*20*1000)).toLocaleString()}
+                    `)
+                    if(server.free)
+                    {
+                        infoEmbed.setDescription(`
+                        **Status** : Free
+                        `);
+                    }
+                    message.channel.send({embeds: [infoEmbed]});
+                break;
                 
             }
         }else

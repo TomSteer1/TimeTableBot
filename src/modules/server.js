@@ -8,6 +8,8 @@ class Server
     setup = false;
     prefix = "!";
     names = {};
+    free = false;
+    lastPaid = 0;
     constructor(guild)
     {
         this.serverId = guild.id;
