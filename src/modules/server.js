@@ -5,11 +5,11 @@ class Server
     channelId;
     messageId;
     members = [];
-    setup = false;
     prefix = "!";
     names = {};
     free = false;
     lastPaid = 0;
+    pingpong = "off";
     constructor(guild)
     {
         this.serverId = guild.id;
