@@ -1,0 +1,18 @@
+{
+  "name": "timetablebot",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "TomSteer1",
+  "license": "ISC",
+  "dependencies": {
+    "crypto-js": "^4.1.1",
+    "discord.js": "^13.5.0",
+    "express": "^4.17.2",
+    "quick.db": "^7.1.3"
+  },
+  "devDependencies": {},
+  "description": ""
+}

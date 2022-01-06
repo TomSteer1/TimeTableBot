@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./style.css">
+    <title>Timetable Bot</title>
+</head>
+<body>
+    <form id="timetable" action="/uploadTimetable" method="POST">
+        <input name="token" value="token" style="display: none;" id="token">
+        <h1 style="grid-row: 1;" >Monday</h1>
+        <select name="monday1" class="mainLesson monday" style="grid-row: 2;">
+        </select> 
+        <select name="monday2" class="mainLesson monday" style="grid-row: 3;">
+        </select> 
+        <select name="monday3" class="mainLesson monday" style="grid-row: 4;">
+        </select> 
+        <select name="monday4" class="mainLesson monday" style="grid-row: 5;">
+        </select> 
+
+        
+        <h1 style="grid-row: 1;" >Tuesday</h1>
+        <select name="tuesday1" class="mainLesson tuesday" style="grid-row: 2;">
+        </select> 
+        <select name="tuesday2" class="mainLesson tuesday" style="grid-row: 3;">
+        </select> 
+        <select name="tuesday3" class="mainLesson tuesday" style="grid-row: 4;">
+        </select> 
+        <select name="tuesday4" class="mainLesson tuesday" style="grid-row: 5;">
+        </select>
+
+        
+        <h1 style="grid-row: 1;" >Wednesday</h1>
+        <select name="wednesday1" class="mainLesson wednesday" style="grid-row: 2;">
+        </select> 
+        <select name="wednesday2" class="mainLesson wednesday" style="grid-row: 3;">
+        </select> 
+        <select name="wednesday3" class="mainLesson wednesday" style="grid-row: 4;">
+        </select> 
+        <select name="wednesday4" class="mainLesson wednesday" style="grid-row: 5;">
+        </select> 
+
+        
+        <h1 style="grid-row: 1;" >Thursday</h1>
+        <select name="thursday1" class="mainLesson thursday" style="grid-row: 2;">
+        </select> 
+        <select name="thursday2" class="mainLesson thursday" style="grid-row: 3;">
+        </select> 
+        <select name="thursday3" class="mainLesson thursday" style="grid-row: 4;">
+        </select> 
+        <select name="thursday4" class="mainLesson thursday" style="grid-row: 5;">
+        </select> 
+
+        
+        <h1 style="grid-row: 1;" >Friday</h1>
+        <select name="friday1" class="mainLesson friday" style="grid-row: 2;">
+        </select>
+        <select name="friday2" class="mainLesson friday" style="grid-row: 3;">
+        </select> 
+        <select name="friday3" class="mainLesson friday" style="grid-row: 4;">
+        </select> 
+        <select name="friday4" class="mainLesson friday" style="grid-row: 5;">
+        </select>
+        <input type="submit" value="Submit Timetable">
+        <button onclick="resetForm()">Reset Timetable</button>
+    </form>
+</body>
+<script>
+    let allClasses = ##CLASSES##;
+    let optionsList = ""
+    allClasses.forEach(function(value,index){
+        optionsList += `<option value=${index}>${value}</option>`
+    })
+    let allDays = document.getElementsByClassName("mainLesson")
+    for(let i = 0 ; i < allDays.length; i++)
+    {
+        allDays[i].innerHTML = optionsList
+    }
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get('token');
+    document.getElementById("token").value = token
+    document.getElementById("resetTimetable").addEventListener("click",function(e){
+        e.preventDefault()
+        document.getElementById("timetable").reset(); 
+        document.getElementById("token").value = token
+    })
+</script>
+</html>

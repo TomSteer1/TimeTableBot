@@ -1,0 +1,81 @@
+body
+{
+    background-color: #121212;
+    overflow: hidden;
+}
+
+form
+{
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%,-50%);
+    display: grid;
+    grid-template-columns: auto auto auto auto auto;
+    grid-template-rows: auto auto auto auto;
+    grid-auto-flow: column dense;
+    column-gap: 1rem;
+    row-gap: 1rem;
+}
+select
+{
+    height: 15vh;
+    width: 15vw;
+    border-radius: 1vh;
+    text-align: center;
+}
+
+input
+{
+    grid-column: 4;
+    grid-row: 6;
+    border-radius: 1vh;
+    max-width: 15vw;
+}
+
+button
+{
+    grid-column: 2;
+    grid-row: 6;
+    border-radius: 1vh;
+    max-width: 15vw;
+}
+
+option
+{
+    text-align: center;
+}
+
+
+h1{
+    color: white;
+    text-align: center;
+    width: 15vw;
+    overflow: hidden;
+    text-overflow:clip;
+}
+
+.monday
+{
+    background-color: #f6958e;
+}
+
+.tuesday
+{
+    background-color: #f6b48e;
+}
+
+.wednesday
+{
+    background-color: #f6e38e;
+}
+
+.thursday
+{
+    background-color: #bbe9f6;
+}
+
+.friday
+{
+    background-color: #dfb6f6;
+}
