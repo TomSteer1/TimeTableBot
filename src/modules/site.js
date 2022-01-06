@@ -79,51 +79,57 @@ app.get("/inandfree",(req,res)=>
         let server = db.get(guildID)
         if(server != undefined)
         {
-            let week = []
-            for(let i = 1;i<=5;i++)
+            if(server.free == true || server.lastPaid + (60*60*24*20*1000) > Date.now())
             {
-                week[i] = []
-                week[i][0] = []
-                week[i][1] = []
-                week[i][2] = []
-            }
-            server.members.forEach(id => {
-                if(fs.existsSync(`./timetables/${id}.json`))
+                let week = []
+                for(let i = 1;i<=5;i++)
                 {
-                    let studentData = fs.readFileSync(`./timetables/${id}.json`);
-                    let student = JSON.parse(studentData);
-                    for(let i = 1;i<=5;i++)
+                    week[i] = []
+                    week[i][0] = []
+                    week[i][1] = []
+                    week[i][2] = []
+                }
+                server.members.forEach(id => {
+                    if(fs.existsSync(`./timetables/${id}.json`))
                     {
-                        let timetable = student.timetable[i]
-                        if(timetable[1] != 0 && timetable[2] == 0 &&(timetable[3] != 0 || timetable[4] != 0))
+                        let studentData = fs.readFileSync(`./timetables/${id}.json`);
+                        let student = JSON.parse(studentData);
+                        for(let i = 1;i<=5;i++)
                         {
-                            week[i][0].push(server.names[id])
-                        }
-                        
-                        if((timetable["1"] != 0 || timetable["2"] != 0 )&&(timetable["3"] != 0 || timetable["4"] != 0))
-                        {
-                            week[i][1].push(server.names[id])
-                        }
-                        if(timetable[4] != 0 &&timetable[3] == 0 &&(timetable[1] != 0 || timetable[2] != 0))
-                        {
-                            week[i][2].push(server.names[id])
+                            let timetable = student.timetable[i]
+                            if(timetable[1] != 0 && timetable[2] == 0 &&(timetable[3] != 0 || timetable[4] != 0))
+                            {
+                                week[i][0].push(server.names[id])
+                            }
+                            
+                            if((timetable["1"] != 0 || timetable["2"] != 0 )&&(timetable["3"] != 0 || timetable["4"] != 0))
+                            {
+                                week[i][1].push(server.names[id])
+                            }
+                            if(timetable[4] != 0 &&timetable[3] == 0 &&(timetable[1] != 0 || timetable[2] != 0))
+                            {
+                                week[i][2].push(server.names[id])
+                            }
                         }
                     }
-                }
-            })
-            let html = ""
-            for(let p = 0;p<=2;p++)
-            {
-                let dayHTML = `<tr><td style="color:white">${periodNames[p]}</td>`
-                for(let d = 1;d<=5;d++)
+                })
+                let html = ""
+                for(let p = 0;p<=2;p++)
                 {
-                    dayHTML += `<td class=day${d}>${week[d][p].join("<br>")}</td>`
+                    let dayHTML = `<tr><td style="color:white">${periodNames[p]}</td>`
+                    for(let d = 1;d<=5;d++)
+                    {
+                        dayHTML += `<td class=day${d}>${week[d][p].join("<br>")}</td>`
+                    }
+                    html += dayHTML + "</tr>"
                 }
-                html += dayHTML + "</tr>"
+                let rawHTML = fs.readFileSync("./site/inandfree.html").toString()
+                rawHTML = rawHTML.replace("##HERE##",html)
+                res.send(rawHTML)
+            }else
+            {
+                res.send("Please pay the subscription to continue using this bot")
             }
-            let rawHTML = fs.readFileSync("./site/inandfree.html").toString()
-            rawHTML = rawHTML.replace("##HERE##",html)
-            res.send(rawHTML)
         }else
         {
             res.send("No server found")
@@ -143,45 +149,52 @@ app.get("/whoisfree",(req,res)=>{
         let server = db.get(guildID)
         if(server != undefined)
         {
-            let week = []
-            for(let d = 1; d <=5;d++)
+            if(server.free == true || server.lastPaid + (60*60*24*20*1000) > Date.now())
             {
-                week[d] = []
-                for(let p = 1;p<=4;p++)
+                let week = []
+                for(let d = 1; d <=5;d++)
                 {
-                    week[d][p] = []
-                }
-            }
-            server.members.forEach(id => {
-                if(fs.existsSync(`./timetables/${id}.json`))
-                {
-                    let studentData = fs.readFileSync(`./timetables/${id}.json`);
-                    let student = JSON.parse(studentData);
-                    for(let d = 1; d <=5;d++)
+                    week[d] = []
+                    for(let p = 1;p<=4;p++)
                     {
-                        for(let p = 1;p<=4;p++)
+                        week[d][p] = []
+                    }
+                }
+                server.members.forEach(id => {
+                    if(fs.existsSync(`./timetables/${id}.json`))
+                    {
+                        let studentData = fs.readFileSync(`./timetables/${id}.json`);
+                        let student = JSON.parse(studentData);
+                        for(let d = 1; d <=5;d++)
                         {
-                            if(student.timetable[d][p] == 0)
+                            for(let p = 1;p<=4;p++)
                             {
-                                week[d][p].push(server.names[id])
+                                if(student.timetable[d][p] == 0)
+                                {
+                                    week[d][p].push(server.names[id])
+                                }
                             }
                         }
                     }
-                }
-            })
-            let html = ""
-            for(let i = 1;i <=4;i++)
-            {
-                let dayHTML = `<tr>`
-                for(let x = 1 ; x <=5;x++)
+                })
+                let html = ""
+                for(let i = 1;i <=4;i++)
                 {
-                    dayHTML += `<td class=day${x}>${week[x][i].join("<br>")}</td>`
+                    let dayHTML = `<tr>`
+                    for(let x = 1 ; x <=5;x++)
+                    {
+                        dayHTML += `<td class=day${x}>${week[x][i].join("<br>")}</td>`
+                    }
+                    html+= dayHTML + "</tr>"
                 }
-                html+= dayHTML + "</tr>"
+                let blankFile = fs.readFileSync("./site/free.html").toString()
+                blankFile = blankFile.replace("##HERE##",html)
+                res.send(blankFile)
             }
-            let blankFile = fs.readFileSync("./site/free.html").toString()
-            blankFile = blankFile.replace("##HERE##",html)
-            res.send(blankFile)
+            else
+            {
+                res.send("Please pay the subscription to continue using this bot");
+            }
         }else
         {
             res.send("No server found");

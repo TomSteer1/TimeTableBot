@@ -85,7 +85,11 @@ class Timetables
                     tomorrowsTimetableEmbed = new discordEmbed("Tomorrow's Timetable","FB00FF").embed
                     this.generateTimetableEmbed(tomorrowsTimetableEmbed,tomorrowsTimetable)
                 }
-                guild.channels.fetch(server.channelId).then(channel => channel.messages.fetch(server.messageId).then(message => message.edit({embeds :[tomorrowsTimetableEmbed,todaysTimetableEmbed]})).catch(() => {}));
+
+                let extraEmbed = new discordEmbed("","0000FF").embed
+                extraEmbed.addField("All Study Periods",`[Open](https://time.tomsteer.me/whoisfree?id=${guild.id})`)
+
+                guild.channels.fetch(server.channelId).then(channel => channel.messages.fetch(server.messageId).then(message => message.edit({embeds :[tomorrowsTimetableEmbed,todaysTimetableEmbed,extraEmbed]})).catch(() => {}));
             }
         }else
         {
