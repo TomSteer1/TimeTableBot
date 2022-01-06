@@ -309,6 +309,7 @@ class Bot
                     **${prefix}config** - Generates a config link
                     **${prefix}update ** - Updates the timetable
                     **${prefix}setup ** - Sets up the timetable
+                    **${prefix}info ** - Shows info about the bot
                     **${prefix}settings ** - Shows the settings  
                     `)
                     message.channel.send({embeds: [helpEmbed]});
