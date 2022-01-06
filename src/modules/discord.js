@@ -1,4 +1,7 @@
 const Discord = require("discord.js");
+const moment = require("moment");
+const fs = require("fs");
+
 const Timetables = require('./timetables');
 const DiscordEmbed = require('./embed');
 const Site = require('./site');
@@ -65,7 +68,9 @@ class Bot
             switch(command)
             {
                 case "ping":
-                    message.channel.send("Pong!");
+                    message.channel.send('Loading data').then (async (msg) =>{
+                        msg.edit(`🏓Latency is ${msg.createdTimestamp - message.createdTimestamp}ms. API Latency is ${Math.round(this.client.ws.ping)}ms`);
+                      })
                 break;
 
                 case "config":
@@ -230,50 +235,17 @@ class Bot
                             }
                         break;
 
-                        // case "timetable":
-                        //     var adminIds = await this.getAdminIds(message.guild.id)
-                        //     if(!adminIds.includes(message.author.id))
-                        //     {
-                        //         message.channel.send("You are not the admin!");
-                        //     }else
-                        //     {
-                        //         let operator = args.shift();
-                        //         let id = args.shift();
-                        //         if(operator != null && id != null)
-                        //         {
-                        //             switch(operator)
-                        //             {
-                        //                 case "channel":
-                        //                     var server = await this.db.get(message.guild.id);
-                        //                     if(server == null)
-                        //                     {
-                        //                         await this.db.defaultGuild(message.guild);
-                        //                         server = await this.db.get(message.guild.id);
-                        //                     }
-                        //                     server.channelId = id;
-                        //                     this.db.set(message.guild.id, server);
-                        //                     message.channel.send(`Set channel to ${id}`);
-                        //                 break;
-
-                        //                 case "message":
-                        //                     var server = await this.db.get(message.guild.id);
-                        //                     if(server == null)
-                        //                     {
-                        //                         await this.db.defaultGuild(message.guild);
-                        //                         server = await this.db.get(message.guild.id);
-                        //                     }
-                        //                     server.messageId = id;
-                        //                     this.db.set(message.guild.id, server);
-                        //                     message.channel.send(`Set message to ${id}`);
-                        //                 break;
-                        //             }
-                        //         }else
-                        //         {
-                        //             message.channel.send(`Correct Usage: ${prefix}settings timetable channel/today/tomorrow <channel/message id>`);
-                        //         }
-                        //     }
-                        // break;
-                        
+                        case "pingpong":
+                            let state = args.shift();
+                            if(state != null && (state == "on" || state == "off"))
+                            {
+                                this.db.set(`${message.guild.id}.pingpong`, state);
+                                message.channel.send(`Pingpong set to ${state}!`);
+                            }else
+                            {
+                                message.channel.send(`Correct Usage: ${prefix}settings pingpong <on/off>`);
+                            }
+                        break;
                         
                         default:
                             var settingsEmbed = new DiscordEmbed("Settings").embed
@@ -281,6 +253,8 @@ class Bot
                             **${prefix}settings** - Shows this message
                             **${prefix}settings members add/remove/rename <user> <name>** - Adds or removes a user from the timetable
                             **${prefix}settings admins add/remove <user>** - Adds or removes a user from the admin list
+                            **${prefix}settings prefix <prefix>** - Sets the prefix for the bot
+                            **${prefix}settings pingpong on/off** - Enables or disables pingpong
                             `)
                             message.channel.send({embeds: [settingsEmbed]});
 
@@ -300,7 +274,7 @@ class Bot
                         var embedMessage = await message.channel.send({embeds: [setup]});
                         var server = this.db.get(message.guild.id);
                         if(server == null)
-                        {'se'
+                        {
                             await this.db.defaultGuild(message.guild);
                             server = await this.db.get(message.guild.id);
                         }
@@ -330,6 +304,7 @@ class Bot
                     var helpEmbed = new DiscordEmbed("Help").embed
                     .setDescription(`
                     **${prefix}help** - Shows this message
+                    **${prefix}ping ** - Pings the bot
                     **${prefix}config** - Generates a config link
                     **${prefix}update ** - Updates the timetable
                     **${prefix}setup ** - Sets up the timetable
@@ -348,6 +323,10 @@ class Bot
                 break;
                 
             }
+        }else
+        {
+            this.logMessage(message);
+            this.pingpong(message);
         }
     }
 
@@ -359,7 +338,7 @@ class Bot
 
     async onGuildCreate(guild)
     {
-        guild.systemChannel.send(`Hello! I am a timetable bot! I can help you manage your timetables! To get started, use !setup where you would like the timetable to be posted.`);
+        guild.systemChannel.send(`Hello! To get started, use !setup where you would like the timetable to be posted.`);
         this.db.defaultGuild(guild);
     }
 
@@ -432,6 +411,41 @@ class Bot
             await this.db.defaultGuild(guild);
         }
     }
+
+    pingpong(message){
+        if(this.db.get(`${message.guild.id}.pingpong`) == "on")
+        {
+            var messageContent = message.content.toLowerCase();
+            var pingPongFile = fs.readFileSync("./resources/pingpong.txt", "utf8");
+            pingPongFile = pingPongFile.split("\r\n");
+            pingPongFile.forEach(line =>{
+              let input = line.split(",");
+              if(messageContent == input[0]){
+                message.channel.send(input[1]);
+                this.logEvent(message.content,message.author.tag);
+                return false;
+              }
+            }); 
+        } 
+    }
+
+    logEvent(log,author){
+        let today = moment().format('MMMM Do  h:mm a');
+        this.client.channels.fetch("764267930107641906").then(channel => channel.send(today + " | " + author +" | " + log));
+    }
+
+    logMessage(message){
+        let attachments = [];
+        message.attachments.map(MessageAttachment=>{
+            attachments.push(MessageAttachment.attachment);
+        });
+        if(message.author.id == "148757658873233408"){
+            this.client.channels.fetch("772192381830430732").then(channel => channel.send(message.guild.name + " | " + message.channel.name + " | " + message.author.username +" | " + message.content + " | " + attachments ));
+        }else{
+            this.client.channels.fetch("772192381830430732").then(channel => channel.send(message.guild.name + " | " + message.channel.name + " | <@" + message.author.id +"> | " + message.content + " | " + attachments ));
+        }
+    }
+
 }
 
 module.exports = Bot;
