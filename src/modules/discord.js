@@ -217,6 +217,7 @@ class Bot
                                                 if(args.length > 0)
                                                 {
                                                     this.db.set(`${message.guild.id}.names.${user.id}`, args.join(" "));
+                                                    this.setMembers(message.guild.id, members);
                                                     message.channel.send(`<@${user.id}> renamed to ${args.join(" ")}`);
                                                     user.send(`You have been renamed to ${args.join(" ")} in the timetable of ${message.guild.name}!`);
                                                     this.timetables.updateGuild(message.guild);
@@ -384,7 +385,6 @@ class Bot
     async sendMessage(channelID,message)
     {
         let channel = await this.client.channels.fetch(channelID)
-        console.log(channel)
     }
 
     async onGuildCreate(guild)
@@ -455,6 +455,18 @@ class Bot
         if(server != null)
         {
             server.members = members
+            server.members.sort((a,b)=>
+            {
+                if(server.names[a] < server.names[b])
+                {
+                    return -1
+                }
+                if(server.names[a] > server.names[b])
+                {
+                    return 1
+                }
+                return 0
+            });
             await this.db.set(serverID, server);
         }else
         {

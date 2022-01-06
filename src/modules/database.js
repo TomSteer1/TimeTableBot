@@ -22,8 +22,6 @@ class Database {
         let server = db.get(serverID);
         server.prefix = prefix;
         db.set(serverID, server);
-        console.log("Prefix changed to " + prefix);
-        console.log(db.get(serverID))
     }
 }
 

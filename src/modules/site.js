@@ -70,6 +70,129 @@ app.post("/uploadTimetable",(req,res)=>
     }
 })
 
+app.get("/inandfree",(req,res)=>
+{
+    let guildID = req.query.id;
+    if(guildID != undefined)
+    {
+        let periodNames = ["Period 2","Lunch","Period 3"]
+        let server = db.get(guildID)
+        if(server != undefined)
+        {
+            let week = []
+            for(let i = 1;i<=5;i++)
+            {
+                week[i] = []
+                week[i][0] = []
+                week[i][1] = []
+                week[i][2] = []
+            }
+            server.members.forEach(id => {
+                if(fs.existsSync(`./timetables/${id}.json`))
+                {
+                    let studentData = fs.readFileSync(`./timetables/${id}.json`);
+                    let student = JSON.parse(studentData);
+                    for(let i = 1;i<=5;i++)
+                    {
+                        let timetable = student.timetable[i]
+                        if(timetable[1] != 0 && timetable[2] == 0 &&(timetable[3] != 0 || timetable[4] != 0))
+                        {
+                            week[i][0].push(server.names[id])
+                        }
+                        
+                        if((timetable["1"] != 0 || timetable["2"] != 0 )&&(timetable["3"] != 0 || timetable["4"] != 0))
+                        {
+                            week[i][1].push(server.names[id])
+                        }
+                        if(timetable[4] != 0 &&timetable[3] == 0 &&(timetable[1] != 0 || timetable[2] != 0))
+                        {
+                            week[i][2].push(server.names[id])
+                        }
+                    }
+                }
+            })
+            let html = ""
+            for(let p = 0;p<=2;p++)
+            {
+                let dayHTML = `<tr><td style="color:white">${periodNames[p]}</td>`
+                for(let d = 1;d<=5;d++)
+                {
+                    dayHTML += `<td class=day${d}>${week[d][p].join("<br>")}</td>`
+                }
+                html += dayHTML + "</tr>"
+            }
+            let rawHTML = fs.readFileSync("./site/inandfree.html").toString()
+            rawHTML = rawHTML.replace("##HERE##",html)
+            res.send(rawHTML)
+        }else
+        {
+            res.send("No server found")
+        }
+    }
+    else
+    {
+        res.send("No ID Supplied");
+    }
+    
+})
+
+app.get("/whoisfree",(req,res)=>{
+    let guildID = req.query.id;
+    if(guildID != undefined)
+    {
+        let server = db.get(guildID)
+        if(server != undefined)
+        {
+            let week = []
+            for(let d = 1; d <=5;d++)
+            {
+                week[d] = []
+                for(let p = 1;p<=4;p++)
+                {
+                    week[d][p] = []
+                }
+            }
+            server.members.forEach(id => {
+                if(fs.existsSync(`./timetables/${id}.json`))
+                {
+                    let studentData = fs.readFileSync(`./timetables/${id}.json`);
+                    let student = JSON.parse(studentData);
+                    for(let d = 1; d <=5;d++)
+                    {
+                        for(let p = 1;p<=4;p++)
+                        {
+                            if(student.timetable[d][p] == 0)
+                            {
+                                week[d][p].push(server.names[id])
+                            }
+                        }
+                    }
+                }
+            })
+            let html = ""
+            for(let i = 1;i <=4;i++)
+            {
+                let dayHTML = `<tr>`
+                for(let x = 1 ; x <=5;x++)
+                {
+                    dayHTML += `<td class=day${x}>${week[x][i].join("<br>")}</td>`
+                }
+                html+= dayHTML + "</tr>"
+            }
+            let blankFile = fs.readFileSync("./site/free.html").toString()
+            blankFile = blankFile.replace("##HERE##",html)
+            res.send(blankFile)
+        }else
+        {
+            res.send("No server found");
+        }
+    }else
+    {
+        res.send("No ID Supplied");
+    }
+})
+
+
 async function createStudent(body,id)
 {
     let studentData = fs.readFileSync(`./resources/Template.json`);
