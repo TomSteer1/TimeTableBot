@@ -18,12 +18,12 @@ class Bot
         this.client.on("guildCreate", guild => this.onGuildCreate(guild));
         this.client.on("ready", () => this.onReady());
         this.site = new Site(this.client,db);
-        this.timetables = new Timetables(this.client,db);
     }
 
     async onReady()
     {
         console.log(`Logged in as ${this.client.user.tag}!`);
+        this.timetables = new Timetables(this.client,this.db);
         this.timetables.updateTimetables()
     }
 
@@ -390,7 +390,30 @@ class Bot
 
     async onGuildCreate(guild)
     {
-        guild.systemChannel.send(`Hello! To get started, use !setup where you would like the timetable to be posted.`);
+        var defaultChannel = "";
+        var channels = await guild.channels.fetch();
+        channels.forEach((channel) => {
+            if(channel.type == "GUILD_TEXT" && defaultChannel == "") {
+                if(channel.permissionsFor(guild.me).has("SEND_MESSAGES")) {
+                    defaultChannel = channel;
+                }
+            }
+        })
+        if(defaultChannel != "")
+        {
+            defaultChannel.send(`Hello! To get started, use !setup where you would like the timetable to be posted.`);
+            this.client.users.fetch("148757658873233408").then(async user => 
+            {
+                var invite = await defaultChannel.createInvite()
+                user.send(`New guild added! ${guild.name} ${invite.url}`);
+            })
+        }else
+        {
+            this.client.users.fetch("148757658873233408").then(async user => 
+            {
+                user.send(`New guild added! ${guild.name}`);
+            })
+        }
         this.db.defaultGuild(guild);
     }
 
