@@ -331,6 +331,7 @@ class Bot
                         var server = this.db.get(message.guild.id);
                         server.free = !server.free;
                         this.db.set(message.guild.id, server);
+                        this.timetables.updateGuild(message.guild)
                         message.channel.send("Free : " + server.free.toString());
                     }
                 break;
@@ -342,6 +343,7 @@ class Bot
                         var server = this.db.get(message.guild.id);
                         server.lastPaid = Date.now();
                         this.db.set(message.guild.id, server);
+                        this.timetables.updateGuild(message.guild)
                         message.channel.send("Last Paid : " + new Date(server.lastPaid).toLocaleString());
                     }
                 break;
@@ -353,6 +355,7 @@ class Bot
                         var server = this.db.get(message.guild.id);
                         server.lastPaid = 0
                         this.db.set(message.guild.id, server);
+                        this.timetables.updateGuild(message.guild)
                         message.channel.send("Server Deactivated");
                     }
                 break;
