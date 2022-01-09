@@ -9,19 +9,20 @@ class Timetables
         this.classes = JSON.parse(classesData)
         this.client = client;
         this.db = db;
-        this.updateTimeout = setTimeout(this.updateTimetables,60*60*1000)
-        this.updateTimetables();
+        this.updateTimeout = setTimeout(this.updateTimetables.bind(this),60*60*1000)
+        // this.updateTimetables();
     }
 
 
     async updateTimetables()
     {
         clearTimeout(this.updateTimeout)
+        console.log("Updating timetables")
         let guilds =  await this.client.guilds.fetch();
         guilds.forEach(guild => {
             this.updateGuild(guild)
         });
-        this.updateTimeout = setTimeout(this.updateTimetables,60*60*1000)
+        this.updateTimeout = setTimeout(this.updateTimetables.bind(this),60*60*1000)
     }
 
     async updateGuild(guild)
