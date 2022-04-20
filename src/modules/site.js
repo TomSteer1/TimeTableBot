@@ -114,6 +114,13 @@ app.get("/inandfree",(req,res)=>
                     }
                 })
                 let html = ""
+                for(let i = 1;i<=5;i++)
+                {
+                    for(let x=0;x<=2;x++)
+                    {
+                        week[i][x].sort();
+                    }
+                }
                 for(let p = 0;p<=2;p++)
                 {
                     let dayHTML = `<tr><td style="color:white">${periodNames[p]}</td>`
@@ -178,6 +185,13 @@ app.get("/whoisfree",(req,res)=>{
                     }
                 })
                 let html = ""
+                for(let i = 1;i<=5;i++)
+                {
+                    for(let x=1;x<=4;x++)
+                    {
+                        week[i][x].sort();
+                    }
+                }
                 for(let i = 1;i <=4;i++)
                 {
                     let dayHTML = `<tr>`

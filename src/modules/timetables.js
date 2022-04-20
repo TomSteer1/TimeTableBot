@@ -64,6 +64,20 @@ class Timetables
                         }
                     })
 
+                    for(let i = 1; i <= 4 ; i++)
+                    {                      
+                        todaysTimetable[i].sort((a,b) => {
+                            if(a.name < b.name) return -1;
+                            if(a.name > b.name) return 1;
+                            return 0;
+                        })
+                        tomorrowsTimetable[i].sort((a,b) => {
+                            if(a.name < b.name) return -1;
+                            if(a.name > b.name) return 1;
+                            return 0;
+                        })
+                    }
+
                     let todaysTimetableEmbed
                     let tomorrowsTimetableEmbed
                     let today = new Date()
